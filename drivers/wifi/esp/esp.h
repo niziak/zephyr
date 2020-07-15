@@ -200,6 +200,8 @@ int esp_socket_put(struct esp_socket *sock);
 struct esp_socket *esp_socket_from_link_id(struct esp_data *data,
 					   uint8_t link_id);
 void esp_socket_init(struct esp_data *data);
+void esp_socket_close(struct esp_socket *sock);
+void esp_socket_reset(struct esp_data *data);
 
 static inline struct esp_data *esp_socket_to_dev(struct esp_socket *sock)
 {

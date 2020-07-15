@@ -68,3 +68,27 @@ void esp_socket_init(struct esp_data *data)
 		k_fifo_init(&sock->fifo_rx_pkt);
 	}
 }
+
+void esp_socket_close(struct esp_socket *sock)
+{
+	struct esp_data *dev;
+
+	dev = esp_socket_to_dev(sock);
+	if (!esp_socket_connected(sock)) {
+		return;
+	}
+
+	sock->flags &= ~(ESP_SOCK_CONNECTED);
+	k_work_submit_to_queue(&dev->workq, &sock->recv_work);
+}
+
+void esp_socket_reset(struct esp_data *data)
+{
+	struct esp_socket *sock;
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(data->sockets); ++i) {
+		sock = &data->sockets[i];
+		esp_socket_close(sock);
+	}
+}

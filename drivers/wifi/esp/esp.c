@@ -288,13 +288,7 @@ MODEM_CMD_DEFINE(on_cmd_closed)
 		return 0;
 	}
 
-	if (!esp_socket_connected(sock)) {
-		LOG_WRN("Link %d already closed", link_id);
-		return 0;
-	}
-
-	sock->flags &= ~(ESP_SOCK_CONNECTED);
-	k_work_submit_to_queue(&dev->workq, &sock->recv_work);
+	esp_socket_close(sock);
 
 	return 0;
 }
@@ -480,6 +474,7 @@ MODEM_CMD_DEFINE(on_cmd_ready)
 		wifi_mgmt_raise_disconnect_result_event(dev->net_iface, 0);
 	}
 
+	esp_socket_reset(dev);
 	net_if_ipv4_addr_rm(dev->net_iface, &dev->ip);
 	k_work_submit_to_queue(&dev->workq, &dev->init_work);
 
